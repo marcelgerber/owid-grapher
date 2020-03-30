@@ -614,7 +614,7 @@ figure[data-grapher-src]:empty:after,
         z-index: $zindex-DataSelector;
         background: rgba(255, 255, 255, 0.94);
         box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.2);
-        overflow-y: scroll;
+        overflow-y: auto;
         -webkit-overflow-scrolling: touch;
         position: absolute;
         left: 0.35em;
@@ -644,6 +644,7 @@ figure[data-grapher-src]:empty:after,
         .wrapper {
             padding-left: 1em;
             padding-right: 1em;
+            max-width: none;
         }
 
         h2 button {
@@ -690,6 +691,10 @@ figure[data-grapher-src]:empty:after,
         .selectedData {
             min-width: 25%;
             padding-left: 1em;
+
+            li {
+                margin-bottom: 0.4em;
+            }
         }
 
         .searchResults {
@@ -697,8 +702,9 @@ figure[data-grapher-src]:empty:after,
         }
 
         .searchResults ul {
-            display: flex;
-            flex-wrap: wrap;
+            display: grid;
+            grid-gap: 0.4em;
+            grid-template-columns: repeat(auto-fit, minmax(15em, 1fr));
         }
 
         ul {
@@ -708,12 +714,6 @@ figure[data-grapher-src]:empty:after,
 
         li {
             list-style-type: none;
-            flex: 1 0 15em;
-            margin-bottom: 0.3em;
-        }
-
-        li > label {
-            width: 100%;
         }
 
         input[type="search"] {

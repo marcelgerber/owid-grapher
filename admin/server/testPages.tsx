@@ -11,8 +11,9 @@ import * as db from "db/db"
 import { ADMIN_BASE_URL, BAKED_GRAPHER_URL, BAKED_BASE_URL } from "settings"
 import { expectInt } from "utils/server/serverUtil"
 import * as querystring from "querystring"
-import * as _ from "lodash"
 import * as url from "url"
+import classnames from "classnames"
+import { parseBool } from "utils/string"
 
 const IS_LIVE = ADMIN_BASE_URL === "https://owid.cloud"
 
@@ -29,6 +30,7 @@ interface EmbedTestPageProps {
     currentPage?: number
     totalPages?: number
     charts: ChartItem[]
+    mobile?: boolean
 }
 
 function EmbedTestPage(props: EmbedTestPageProps) {
@@ -45,6 +47,12 @@ function EmbedTestPage(props: EmbedTestPageProps) {
             flex: 1;
             height: 450px;
             margin: 10px;
+        }
+
+        .mobile figure, .mobile iframe {
+            height: 500px;
+            width: 360px;
+            flex: 0 0 auto;
         }
 
         .row {
@@ -94,7 +102,11 @@ function EmbedTestPage(props: EmbedTestPageProps) {
                 {props.charts.map(chart => (
                     <div className="row">
                         <div className="chart-id">{chart.id}</div>
-                        <div className="side-by-side">
+                        <div
+                            className={classnames("side-by-side", {
+                                mobile: props.mobile
+                            })}
+                        >
                             <iframe
                                 src={`https://ourworldindata.org/grapher/${chart.slug}`}
                             />
@@ -135,6 +147,7 @@ testPages.get("/embeds", async (req, res) => {
     let tab = req.query.tab
     const namespaces =
         (req.query.namespaces && req.query.namespaces.split(",")) || []
+    const mobile = parseBool(req.query.mobile ?? "")
 
     if (req.query.type) {
         if (req.query.type === "ChoroplethMap") {
@@ -200,13 +213,13 @@ testPages.get("/embeds", async (req, res) => {
         page > 1
             ? (url.parse(req.originalUrl).pathname as string) +
               "?" +
-              querystring.stringify(_.extend({}, req.query, { page: page - 1 }))
+              querystring.stringify({ ...req.query, page: page - 1 })
             : undefined
     const nextPageUrl =
         page < numPages
             ? (url.parse(req.originalUrl).pathname as string) +
               "?" +
-              querystring.stringify(_.extend({}, req.query, { page: page + 1 }))
+              querystring.stringify({ ...req.query, page: page - 1 })
             : undefined
 
     res.send(
@@ -217,6 +230,7 @@ testPages.get("/embeds", async (req, res) => {
                 charts={charts}
                 currentPage={page}
                 totalPages={numPages}
+                mobile={mobile}
             />
         )
     )
@@ -395,7 +409,7 @@ testPages.get("/embedVariants", async (req, res) => {
 
 testPages.get("/chartFeatureUsage.json", async (req, res) => {
     const report = await Chart.getChartFeatureUsage()
-    res.send(JSON.stringify(report, null, 2))
+    res.type("json").send(JSON.stringify(report, null, 2))
 })
 
 testPages.get("/:slug.svg", async (req, res) => {

@@ -320,16 +320,13 @@ export const FrontPage = (props: {
                                                     href={`/${post.path}`}
                                                     data-track-note="homepage-explainer"
                                                 >
-                                                    <div className="thumbnail">
-                                                        <div
-                                                            className="cover-image"
-                                                            style={{
-                                                                backgroundImage:
-                                                                    post.imageUrl &&
-                                                                    `url(${post.imageUrl})`
-                                                            }}
+                                                    {post.imageUrl && (
+                                                        <img
+                                                            className="thumbnail cover-image"
+                                                            src={post.imageUrl}
+                                                            loading="lazy"
                                                         />
-                                                    </div>
+                                                    )}
                                                     <div className="info">
                                                         <h3 className="title">
                                                             {post.title}

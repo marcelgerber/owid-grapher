@@ -323,7 +323,11 @@ export const FrontPage = (props: {
                                                     {post.imageUrl && (
                                                         <img
                                                             className="thumbnail cover-image"
-                                                            src={post.imageUrl}
+                                                            src={`https://ourworldindata.org${
+                                                                new URL(
+                                                                    post.imageUrl
+                                                                ).pathname
+                                                            }`}
                                                             loading="lazy"
                                                         />
                                                     )}

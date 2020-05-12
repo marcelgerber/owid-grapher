@@ -24,12 +24,12 @@ async function getChartsBySlug() {
     for (const row of await chartsQuery) {
         const chart = JSON.parse(row.config)
         chart.id = row.id
-        chartsBySlug.set(chart.slug, chart)
+        chartsBySlug.set(chart.slug.toLowercase(), chart)
         chartsById.set(row.id, chart)
     }
 
     for (const row of await redirectQuery) {
-        chartsBySlug.set(row.slug, chartsById.get(row.chart_id))
+        chartsBySlug.set(row.slug.toLowercase(), chartsById.get(row.chart_id))
     }
 
     return chartsBySlug
@@ -46,7 +46,7 @@ export async function bakeChartsToImages(
     for (const urlStr of chartUrls) {
         const url = parseUrl(urlStr)
         const slug = _.last(url.pathname.split("/")) as string
-        const jsonConfig = chartsBySlug.get(slug)
+        const jsonConfig = chartsBySlug.get(slug.toLowerCase())
         if (jsonConfig) {
             // the type definition for url.query is wrong (bc we have query string parsing disabled),
             // so we have to explicitly cast it

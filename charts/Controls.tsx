@@ -1,4 +1,4 @@
-import * as React from "react"
+import React, { useCallback, useEffect } from "react"
 import { observable, computed, action } from "mobx"
 import { observer } from "mobx-react"
 import * as Cookies from "js-cookie"
@@ -35,6 +35,7 @@ import { TimeBound } from "./TimeBounds"
 import { Bounds } from "./Bounds"
 import { MapProjection } from "./MapProjection"
 import { asArray, getStylesForTargetHeight } from "utils/client/react-select"
+import classNames from "classnames"
 
 @observer
 class EmbedMenu extends React.Component<{
@@ -85,78 +86,52 @@ interface ShareMenuProps {
     onDismiss: () => void
 }
 
-interface ShareMenuState {
-    copied: boolean
-}
+export const ShareMenu = (props: ShareMenuProps) => {
+    const [copied, setCopied] = React.useState(false)
 
-@observer
-class ShareMenu extends React.Component<ShareMenuProps, ShareMenuState> {
-    dismissable = true
+    const divContainer = React.useRef<HTMLDivElement>(null)
 
-    constructor(props: ShareMenuProps) {
-        super(props)
-
-        this.state = {
-            copied: false
-        }
-    }
-
-    @computed get title(): string {
-        return this.props.chart.data.currentTitle
-    }
-
-    @computed get isDisabled(): boolean {
-        return !this.props.chart.props.slug
-    }
-
-    @computed get editUrl(): string | undefined {
-        return Cookies.get("isAdmin") || ENV === "development"
-            ? `${ADMIN_BASE_URL}/admin/charts/${this.props.chart.props.id}/edit`
+    const title = props.chart.data.currentTitle
+    const isDisabled = !props.chart.props.slug
+    const editUrl =
+        Cookies.get("isAdmin") || ENV === "development"
+            ? `${ADMIN_BASE_URL}/admin/charts/${props.chart.props.id}/edit`
             : undefined
-    }
+    const canonicalUrl = props.chart.url.canonicalUrl
 
-    @computed get canonicalUrl(): string | undefined {
-        return this.props.chart.url.canonicalUrl
-    }
+    const dismiss = useCallback(() => props.onDismiss(), [props.onDismiss])
 
-    @action.bound dismiss() {
-        this.props.onDismiss()
-    }
+    const onClickSomewhere = useCallback(
+        (e: MouseEvent) => {
+            if ((e.target as Node).contains(divContainer.current)) dismiss()
+        },
+        [dismiss]
+    )
 
-    @action.bound onClickSomewhere() {
-        if (this.dismissable) {
-            this.dismiss()
-        } else {
-            this.dismissable = true
-        }
-    }
+    useEffect(() => {
+        document.addEventListener("click", onClickSomewhere)
 
-    componentDidMount() {
-        document.addEventListener("click", this.onClickSomewhere)
-    }
+        return () => document.removeEventListener("click", onClickSomewhere)
+    }, [onClickSomewhere])
 
-    componentWillUnmount() {
-        document.removeEventListener("click", this.onClickSomewhere)
-    }
-
-    @action.bound onEmbed() {
-        if (this.canonicalUrl) {
-            this.props.chartView.addPopup(
+    const onEmbed = useCallback(() => {
+        if (canonicalUrl) {
+            props.chartView.addPopup(
                 <EmbedMenu
                     key="EmbedMenu"
-                    chartView={this.props.chartView}
-                    embedUrl={this.canonicalUrl}
+                    chartView={props.chartView}
+                    embedUrl={canonicalUrl}
                 />
             )
-            this.dismiss()
+            dismiss()
         }
-    }
+    }, [props.chartView, canonicalUrl, dismiss])
 
-    @action.bound async onNavigatorShare() {
-        if (this.canonicalUrl && navigator.share) {
+    const onNavigatorShare = useCallback(async () => {
+        if (canonicalUrl && navigator.share) {
             const shareData = {
-                title: this.title,
-                url: this.canonicalUrl
+                title,
+                url: canonicalUrl
             }
 
             try {
@@ -165,98 +140,85 @@ class ShareMenu extends React.Component<ShareMenuProps, ShareMenuState> {
                 console.error("couldn't share using navigator.share", err)
             }
         }
-    }
+    }, [canonicalUrl, title])
 
-    @action.bound onCopy() {
-        if (this.canonicalUrl) {
-            if (copy(this.canonicalUrl)) this.setState({ copied: true })
+    const onCopy = useCallback(() => {
+        if (canonicalUrl) {
+            if (copy(canonicalUrl)) setCopied(true)
         }
-    }
+    }, [canonicalUrl, setCopied])
 
-    @computed get twitterHref(): string {
-        let href =
-            "https://twitter.com/intent/tweet/?text=" +
-            encodeURIComponent(this.title)
-        if (this.canonicalUrl)
-            href += "&url=" + encodeURIComponent(this.canonicalUrl)
-        return href
-    }
+    const twitterHref = `https://twitter.com/intent/tweet/?text=${encodeURIComponent(
+        title
+    )}${canonicalUrl ? `&url=${encodeURIComponent(canonicalUrl)}` : ""}`
 
-    @computed get facebookHref(): string {
-        let href =
-            "https://www.facebook.com/dialog/share?app_id=1149943818390250&display=page"
-        if (this.canonicalUrl)
-            href += "&href=" + encodeURIComponent(this.canonicalUrl)
-        return href
-    }
+    const facebookHref = `https://www.facebook.com/dialog/share?app_id=1149943818390250&display=page${
+        canonicalUrl ? `&href=${encodeURIComponent(canonicalUrl)}` : ""
+    }`
 
-    render() {
-        const { editUrl, twitterHref, facebookHref, isDisabled } = this
-
-        return (
-            <div
-                className={"ShareMenu" + (isDisabled ? " disabled" : "")}
-                onClick={action(() => (this.dismissable = false))}
+    return (
+        <div
+            ref={divContainer}
+            className={classNames("ShareMenu", { disabled: isDisabled })}
+        >
+            <h2>Share</h2>
+            <a
+                className="btn"
+                target="_blank"
+                title="Tweet a link"
+                data-track-note="chart-share-twitter"
+                href={twitterHref}
             >
-                <h2>Share</h2>
+                <FontAwesomeIcon icon={faTwitter} /> Twitter
+            </a>
+            <a
+                className="btn"
+                target="_blank"
+                title="Share on Facebook"
+                data-track-note="chart-share-facebook"
+                href={facebookHref}
+            >
+                <FontAwesomeIcon icon={faFacebook} /> Facebook
+            </a>
+            <a
+                className="btn"
+                title="Embed this visualization in another HTML document"
+                data-track-note="chart-share-embed"
+                onClick={onEmbed}
+            >
+                <FontAwesomeIcon icon={faCode} /> Embed
+            </a>
+            {"share" in navigator && (
+                <a
+                    className="btn"
+                    title="Share this visualization with an app on your device"
+                    data-track-note="chart-share-navigator"
+                    onClick={onNavigatorShare}
+                >
+                    <FontAwesomeIcon icon={faShareAlt} /> Share via&hellip;
+                </a>
+            )}
+            <a
+                className="btn"
+                title="Copy link to clipboard"
+                data-track-note="chart-share-copylink"
+                onClick={onCopy}
+            >
+                <FontAwesomeIcon icon={faCopy} />
+                {copied ? "Copied!" : "Copy link"}
+            </a>
+            {editUrl && (
                 <a
                     className="btn"
                     target="_blank"
-                    title="Tweet a link"
-                    data-track-note="chart-share-twitter"
-                    href={twitterHref}
+                    title="Edit chart"
+                    href={editUrl}
                 >
-                    <FontAwesomeIcon icon={faTwitter} /> Twitter
+                    <FontAwesomeIcon icon={faEdit} /> Edit
                 </a>
-                <a
-                    className="btn"
-                    target="_blank"
-                    title="Share on Facebook"
-                    data-track-note="chart-share-facebook"
-                    href={facebookHref}
-                >
-                    <FontAwesomeIcon icon={faFacebook} /> Facebook
-                </a>
-                <a
-                    className="btn"
-                    title="Embed this visualization in another HTML document"
-                    data-track-note="chart-share-embed"
-                    onClick={this.onEmbed}
-                >
-                    <FontAwesomeIcon icon={faCode} /> Embed
-                </a>
-                {"share" in navigator && (
-                    <a
-                        className="btn"
-                        title="Share this visualization with an app on your device"
-                        data-track-note="chart-share-navigator"
-                        onClick={this.onNavigatorShare}
-                    >
-                        <FontAwesomeIcon icon={faShareAlt} /> Share via&hellip;
-                    </a>
-                )}
-                <a
-                    className="btn"
-                    title="Copy link to clipboard"
-                    data-track-note="chart-share-copylink"
-                    onClick={this.onCopy}
-                >
-                    <FontAwesomeIcon icon={faCopy} />
-                    {this.state.copied ? "Copied!" : "Copy link"}
-                </a>
-                {editUrl && (
-                    <a
-                        className="btn"
-                        target="_blank"
-                        title="Edit chart"
-                        href={editUrl}
-                    >
-                        <FontAwesomeIcon icon={faEdit} /> Edit
-                    </a>
-                )}
-            </div>
-        )
-    }
+            )}
+        </div>
+    )
 }
 
 @observer

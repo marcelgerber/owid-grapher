@@ -160,48 +160,27 @@ export interface NumberFieldProps {
     helpText?: string
 }
 
-interface NumberFieldState {
+export const NumberField = (props: NumberFieldProps) => {
     /** The state of user input when not able to be parsed. Allows users to input intermediately un-parsable values */
-    inputValue?: string
-}
+    const [inputValue, setInputValue] = React.useState()
 
-export class NumberField extends React.Component<
-    NumberFieldProps,
-    NumberFieldState
-> {
-    constructor(props: NumberFieldProps) {
-        super(props)
-
-        this.state = {
-            inputValue: undefined
+    const textFieldProps = {
+        ...props,
+        value: inputValue ?? props.value?.toString(),
+        onValue: (value: string) => {
+            const allowInputRegex = new RegExp(
+                (props.allowNegative ? "^-?" : "^") +
+                    (props.allowDecimal ? "\\d*\\.?\\d*$" : "\\d*$")
+            )
+            if (!allowInputRegex.test(value)) return
+            const asNumber = parseFloat(value)
+            const isNumber = !isNaN(asNumber)
+            const inputMatches = value === asNumber.toString()
+            setInputValue(inputMatches ? undefined : value)
+            props.onValue(isNumber ? asNumber : undefined)
         }
     }
-
-    render() {
-        const { props, state } = this
-
-        const textFieldProps = extend({}, props, {
-            value: state.inputValue ?? props.value?.toString(),
-            onValue: (value: string) => {
-                const allowInputRegex = new RegExp(
-                    (props.allowNegative ? "^-?" : "^") +
-                        (props.allowDecimal ? "\\d*\\.?\\d*$" : "\\d*$")
-                )
-                if (!allowInputRegex.test(value)) return
-                const asNumber = parseFloat(value)
-                const isNumber = !isNaN(asNumber)
-                const inputMatches = value === asNumber.toString()
-                this.setState({ inputValue: inputMatches ? undefined : value })
-                props.onValue(isNumber ? asNumber : undefined)
-            },
-            onBlur: () =>
-                this.setState({
-                    inputValue: undefined
-                })
-        })
-
-        return <TextField {...textFieldProps} />
-    }
+    return <TextField {...textFieldProps} />
 }
 
 export interface SelectFieldProps {
@@ -882,6 +861,7 @@ import { TagBadge, Tag } from "./TagBadge"
 // NOTE (Mispy): Using my own fork of this which is modified to autoselect the first option.
 // Better UX for case when you aren't adding new tags, only selecting from list.
 import ReactTags from "react-tag-autocomplete"
+import { text } from "@fortawesome/fontawesome-svg-core"
 
 @observer
 class EditTags extends React.Component<{

@@ -1,69 +1,45 @@
-import * as React from "react"
-import { observable, action, runInAction } from "mobx"
-import { observer } from "mobx-react"
+import React, { useEffect, useState } from "react"
 import { SearchResults } from "./SearchResults"
 import { SiteSearchResults, siteSearch } from "site/siteSearch"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faSearch } from "@fortawesome/free-solid-svg-icons/faSearch"
 
-class HeaderSearchResults extends React.Component<{
-    results: SiteSearchResults
-}> {
-    componentDidMount() {
+const HeaderSearchResults = (props: { results: SiteSearchResults }) => {
+    useEffect(() => {
         document.body.style.overflowY = "hidden"
-    }
 
-    componentWillUnmount() {
-        document.body.style.overflowY = ""
-    }
+        return () => {
+            document.body.style.overflowY = ""
+        }
+    }, [])
 
-    render() {
-        return <SearchResults results={this.props.results} />
-    }
+    return <SearchResults results={props.results} />
 }
 
-@observer
-export class HeaderSearch extends React.Component<{ autoFocus?: boolean }> {
-    @observable.ref results?: SiteSearchResults
-    lastQuery?: string
+export const HeaderSearch = (props: { autoFocus?: boolean }) => {
+    const [search, setSearch] = useState("")
+    const [results, setResults] = useState<SiteSearchResults | undefined>(
+        undefined
+    )
 
-    async runSearch(query: string) {
-        const results = await siteSearch(query)
+    useEffect(() => {
+        if (search === "") setResults(undefined)
+        else siteSearch(search).then(setResults)
+    }, [search, setResults])
 
-        if (this.lastQuery !== query) {
-            // Don't need this result anymore
-            return
-        }
-
-        runInAction(() => (this.results = results))
-    }
-
-    @action.bound onSearch(e: React.ChangeEvent<HTMLInputElement>) {
-        const value = e.currentTarget.value
-        this.lastQuery = value
-        if (value) {
-            this.runSearch(value)
-        } else {
-            this.results = undefined
-        }
-    }
-
-    render() {
-        const { results } = this
-        return (
-            <form action="/search" method="GET" className="HeaderSearch">
-                <input
-                    type="search"
-                    name="q"
-                    onChange={e => this.onSearch(e)}
-                    placeholder="Search..."
-                    autoFocus={this.props.autoFocus}
-                />
-                <div className="icon">
-                    <FontAwesomeIcon icon={faSearch} />
-                </div>
-                {results && <HeaderSearchResults results={results} />}
-            </form>
-        )
-    }
+    return (
+        <form action="/search" method="GET" className="HeaderSearch">
+            <input
+                type="search"
+                name="q"
+                onChange={e => setSearch(e.currentTarget.value)}
+                placeholder="Search..."
+                autoFocus={props.autoFocus}
+            />
+            <div className="icon">
+                <FontAwesomeIcon icon={faSearch} />
+            </div>
+            {results && <HeaderSearchResults results={results} />}
+        </form>
+    )
 }

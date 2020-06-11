@@ -48,7 +48,7 @@ export interface ParsedCovidRow {
     female_smokers: number
     male_smokers: number
     handwashing_facilities: number
-    hospital_beds_per_100k: number
+    hospital_beds_per_thousand: number
 }
 
 export interface CountryOption {
@@ -58,5 +58,8 @@ export interface CountryOption {
     continent: string
     population: number
     rows: ParsedCovidRow[]
-    latestTotalTestsPerCase: number | undefined
+}
+
+export type CountryOptionWithValue = CountryOption & {
+    plotValue: number | string | undefined
 }

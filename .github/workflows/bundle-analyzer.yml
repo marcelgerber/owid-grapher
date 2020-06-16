@@ -38,8 +38,6 @@ jobs:
               run: yarn --frozen-lockfile
 
             - name: Run bundle-analyzer
-              shell: bash
-              run: |
-                  yarn bundle-analyzer --token "$BUNDLE_ANALYZER_TOKEN"
+              run: yarn bundle-analyzer
               env:
                   BUNDLE_ANALYZER_TOKEN: "${{ secrets.BUNDLE_ANALYZER_TOKEN }}"

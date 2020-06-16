@@ -1,8 +1,8 @@
-name: Bundlewatch
+name: bundle-analyzer
 on: [push]
 
 jobs:
-    bundlewatch:
+    bundle-analyzer:
         runs-on: ubuntu-latest
 
         steps:
@@ -37,7 +37,9 @@ jobs:
             - name: Install dependencies
               run: yarn --frozen-lockfile
 
-            - name: Run bundlewatch
-              run: yarn bundlewatch
+            - name: Run bundle-analyzer
+              shell: bash
+              run: |
+                  yarn bundle-analyzer --token "$BUNDLE_ANALYZER_TOKEN"
               env:
-                  BUNDLEWATCH_GITHUB_TOKEN: "${{ secrets.BUNDLEWATCH_GITHUB_TOKEN }}"
+                  BUNDLE_ANALYZER_TOKEN: "${{ secrets.BUNDLE_ANALYZER_TOKEN }}"

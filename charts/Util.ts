@@ -123,6 +123,8 @@ export {
 
 import { fromString } from "html-to-text"
 
+export { fromString }
+
 import moment from "moment"
 import { format } from "d3-format"
 import { extent } from "d3-array"

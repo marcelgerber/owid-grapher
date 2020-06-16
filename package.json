@@ -34,7 +34,7 @@
         "storybook": "yarn tsn node_modules/.bin/start-storybook -p 6006",
         "build-storybook": "build-storybook",
         "bundlewatch": "ENV=production webpack -p && bundlewatch --config .bundlewatch.config.json",
-        "bundle-analyzer": "ENV=production webpack -p --json | bundle-analyzer",
+        "bundle-analyzer": "ENV=production webpack -p --json | bundle-analyzer --config-file .bundle-analyzerrc.json",
         "bundlewatch-json": "ENV=production webpack -p --json > dist/webpack-bundle-stats.json && bundlewatch --config .bundlewatch.config.json",
         "live-commit": "yarn tsn scripts/liveCommit.ts"
     },
@@ -234,17 +234,5 @@
         ">0.5%",
         "Firefox ESR",
         "not dead"
-    ],
-    "bundle-analyzer": {
-        "files": [
-            {
-                "test": "*/js/commons.js",
-                "maxSize": "1.5 MB"
-            },
-            {
-                "test": "*/js/owid.js",
-                "maxSize": "400 KB"
-            }
-        ]
-    }
+    ]
 }

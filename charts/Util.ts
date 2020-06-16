@@ -59,6 +59,8 @@ import memoize from "lodash/memoize"
 import takeWhile from "lodash/takeWhile"
 import upperFirst from "lodash/upperFirst"
 
+import { flatMap } from "lodash"
+
 export {
     isEqual,
     map,
@@ -118,7 +120,8 @@ export {
     mapKeys,
     memoize,
     takeWhile,
-    upperFirst
+    upperFirst,
+    flatMap
 }
 
 import moment from "moment"

@@ -133,8 +133,6 @@ import { TickFormattingOptions } from "./TickFormattingOptions"
 import { isUnboundedLeft, isUnboundedRight } from "./TimeBounds"
 import { EPOCH_DATE } from "settings"
 
-import { flatMap } from "lodash"
-
 export type SVGElement = any
 export type VNode = any
 

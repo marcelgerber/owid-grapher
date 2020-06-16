@@ -1,5 +1,12 @@
 name: Bundlewatch
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types: 
+      - opened
+      - synchronize
 env:
   CI: true
   NODE: 12.x

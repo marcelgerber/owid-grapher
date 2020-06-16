@@ -1,12 +1,12 @@
 {
     "files": [
         {
-            "test": "*/js/commons.js",
-            "maxSize": "1.5 MB"
+            "test": "**/commons.js",
+            "maxSize": "450 kB"
         },
         {
-            "test": "*/js/owid.js",
-            "maxSize": "400 KB"
+            "test": "**/owid.js",
+            "maxSize": "80 kB"
         }
     ]
 }

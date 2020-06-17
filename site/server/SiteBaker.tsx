@@ -59,6 +59,7 @@ import {
     countryProfileSpecs,
     co2CountryProfileRootPath
 } from "site/client/CountryProfileConstants"
+import { ENV } from "settings"
 
 // Static site generator using Wordpress
 
@@ -129,9 +130,20 @@ export class SiteBaker {
         )
 
         // Redirects from Wordpress admin UI
-        const rows = await wpdb.query(
-            `SELECT url, action_data, action_code FROM wp_redirection_items WHERE status = 'enabled'`
-        )
+        let rows = []
+
+        try {
+            rows = await wpdb.query(
+                `SELECT url, action_data, action_code FROM wp_redirection_items WHERE status = 'enabled'`
+            )
+        } catch (e) {
+            if (ENV === "production")
+                throw new Error(
+                    "Could not access Wordpress table wp_redirection_items"
+                )
+            else console.warn("Wordpress redirects could not be baked")
+        }
+
         redirects.push(
             ...rows.map(
                 row =>
@@ -173,12 +185,12 @@ export class SiteBaker {
 
     async bakeEmbeds() {
         // Find all grapher urls used as embeds in all posts on the site
-        const rows = await wpdb.query(
-            `SELECT post_content FROM wp_posts WHERE (post_type='page' OR post_type='post' OR post_type='wp_block') AND post_status='publish'`
-        )
+
+        const posts = await wpdb.getPosts(["page", "posts", "wp_block"])
+
         let grapherUrls = []
-        for (const row of rows) {
-            const $ = cheerio.load(row.post_content)
+        for (const postApi of posts) {
+            const $ = cheerio.load(postApi.content.rendered)
             grapherUrls.push(
                 ...$("iframe")
                     .toArray()

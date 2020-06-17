@@ -580,7 +580,7 @@ export async function getBlogIndex(): Promise<FullPost[]> {
     return cachedPosts
 }
 
-interface TablepressTable {
+export interface TablepressTable {
     tableId: string
     data: string[][]
 }

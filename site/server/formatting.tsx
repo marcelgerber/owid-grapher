@@ -5,8 +5,8 @@ import * as _ from "lodash"
 import * as React from "react"
 import * as ReactDOMServer from "react-dom/server"
 import { HTTPS_ONLY } from "serverSettings"
-import { BAKED_BASE_URL, WORDPRESS_URL } from "settings"
-import { getTables, FullPost } from "db/wpdb"
+import { BAKED_BASE_URL, WORDPRESS_URL, ENV } from "settings"
+import { getTables, FullPost, TablepressTable } from "db/wpdb"
 import Tablepress from "./views/Tablepress"
 import { GrapherExports } from "./grapherUtil"
 import * as path from "path"
@@ -148,9 +148,18 @@ export async function formatWordpressPost(
     })
 
     // Insert [table id=foo] tablepress tables
-    const tables = await getTables()
+    let tables = new Map<string, TablepressTable>()
+    try {
+        tables = await getTables()
+    } catch (e) {
+        if (ENV === "production")
+            throw new Error(
+                "Couldn't retrieve Tablepress tables from Wordpress!"
+            )
+        else console.log("Couldn't retrieve Tablepress tables from Wordpress")
+    }
     html = html.replace(/\[table\s+id=(\d+)\s*\/\]/g, (match, tableId) => {
-        const table = tables.get(tableId)
+        const table = tables?.get(tableId)
         if (table)
             return ReactDOMServer.renderToStaticMarkup(
                 <Tablepress data={table.data} />

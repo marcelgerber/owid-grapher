@@ -5,8 +5,6 @@ import "charts/client/chart.scss"
 // from a very large icon down to a properly sized one a moment later."
 import "@fortawesome/fontawesome-svg-core/styles.css"
 
-import SmoothScroll from "smooth-scroll"
-
 import { Analytics } from "./Analytics"
 import { runChartsIndexPage } from "./runChartsIndexPage"
 import { runHeaderMenus } from "./SiteHeaderMenus"
@@ -67,13 +65,6 @@ if (
     const adminbar = document.getElementById("wpadminbar")
     if (adminbar) adminbar.style.display = ""
 }
-
-new SmoothScroll('a[href*="#"][data-smooth-scroll]', {
-    speed: 600,
-    durationMax: 800,
-    durationMin: 100,
-    popstate: false
-})
 
 document.addEventListener("click", async ev => {
     const targetElement = ev.target as HTMLElement

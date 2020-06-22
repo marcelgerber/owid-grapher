@@ -93,7 +93,6 @@ export const FrontPage = (props: {
                         <a
                             href="#entries"
                             className="see-all"
-                            data-smooth-scroll
                             data-track-note="homepage-scroll"
                         >
                             Scroll to all our articles

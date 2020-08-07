@@ -430,6 +430,7 @@ export async function formatWordpressPost(
                 if ($heading.is("h2")) {
                     const tocHeading = {
                         text: headingText,
+                        html: $heading.html() || undefined,
                         slug: slug,
                         isSubheading: false
                     }

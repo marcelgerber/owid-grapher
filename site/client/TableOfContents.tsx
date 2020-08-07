@@ -5,11 +5,17 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faListAlt } from "@fortawesome/free-solid-svg-icons/faListAlt"
 import { faChevronLeft } from "@fortawesome/free-solid-svg-icons/faChevronLeft"
 import { useTriggerWhenClickOutside } from "./hooks"
+import striptags from "striptags"
 
 const TOC_CLASS_NAME = "entry-sidebar"
 
 interface TableOfContentsData {
-    headings: { isSubheading: boolean; slug: string; text: string }[]
+    headings: {
+        isSubheading: boolean
+        slug: string
+        text: string
+        html?: string
+    }[]
     pageTitle: string
     hideSubheadings?: boolean
 }
@@ -183,7 +189,18 @@ export const TableOfContents = ({
                                 }
                             >
                                 <a onClick={toggle} href={`#${heading.slug}`}>
-                                    {heading.text}
+                                    {heading.html ? (
+                                        <span
+                                            dangerouslySetInnerHTML={{
+                                                __html: striptags(
+                                                    heading.html,
+                                                    ["sub", "sup"]
+                                                )
+                                            }}
+                                        />
+                                    ) : (
+                                        heading.text
+                                    )}
                                 </a>
                             </li>
                         ))}

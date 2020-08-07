@@ -574,7 +574,7 @@ export class SiteBaker {
         await this.bakeBlogIndex()
         await bakeCountries(this)
         await this.bakeRSS()
-        await this.bakeAssets()
+        // await this.bakeAssets()
         await this.bakeSpecialPages()
         await this.bakeGoogleScholar()
         await this.bakeCountryProfiles()

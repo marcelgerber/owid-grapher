@@ -65,7 +65,7 @@ export class AxisOptions implements AxisOptionsInterface {
     @observable.ref max?: number = undefined
     @observable.ref scaleType?: ScaleType = undefined
     @observable.ref canChangeScaleType?: true = undefined
-    @observable label: string = ""
+    @observable label: string = 1
     @observable.ref removePointsOutsideDomain?: true = undefined
     @observable private containerOptions: AxisContainerOptions
 

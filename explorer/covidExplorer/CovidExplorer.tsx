@@ -47,7 +47,7 @@ import {
     perCapitaDivisorByMetric,
 } from "./CovidExplorerTable"
 import { BAKED_BASE_URL } from "settings"
-import moment from "moment"
+import { DateTime } from "luxon"
 import {
     CovidGrapherRow,
     IntervalOption,
@@ -386,7 +386,7 @@ export class CovidExplorer extends React.Component<{
     }
 
     @computed get howLongAgo() {
-        return moment.utc(this.props.updated).fromNow()
+        return DateTime.fromISO(this.props.updated, { zone: "utc" }).diffNow()
     }
 
     @action.bound onResize() {

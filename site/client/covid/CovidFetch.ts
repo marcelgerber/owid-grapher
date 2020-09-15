@@ -1,5 +1,4 @@
 import { csvParse } from "d3-dsv"
-import moment from "moment"
 
 import {
     fetchText,
@@ -10,6 +9,7 @@ import {
 
 import { CovidSeries } from "./CovidTypes"
 import { ECDC_DATA_URL, TESTS_DATA_URL } from "./CovidConstants"
+import { DateTime } from "luxon"
 
 async function _fetchECDCData(): Promise<CovidSeries> {
     const responseText = await retryPromise(() => fetchText(ECDC_DATA_URL))
@@ -60,10 +60,10 @@ export async function fetchTestsData(): Promise<CovidSeries> {
     const responseText = await retryPromise(() => fetchText(TESTS_DATA_URL))
     const rows: CovidSeries = csvParse(responseText).map((row) => {
         return {
-            date: moment(
+            date: DateTime.fromFormat(
                 row["Date to which estimate refers (dd mmm yyyy)"] as string,
-                "DD MMMM YYYY"
-            ).toDate(),
+                "dd MMMM yyyy"
+            ).toJSDate(),
             location: row["Entity string"] as string,
             tests: {
                 totalTests: parseIntOrUndefined(
@@ -74,10 +74,10 @@ export async function fetchTestsData(): Promise<CovidSeries> {
                 ),
                 sourceURL: row["Source URL"],
                 sourceLabel: row["Source label"],
-                publicationDate: moment(
+                publicationDate: DateTime.fromFormat(
                     `${row["Date of source publication (dd mmm yyyy)"]} ${row["Time of source publication (hh:mm)"]}`,
-                    "DD MMMM YYYY HH:mm"
-                ).toDate(),
+                    "dd MMMM yyyy HH:mm"
+                ).toJSDate(),
                 remarks: row["Remarks"],
                 population: parseIntOrUndefined(row["Population"]),
                 nonOfficial:

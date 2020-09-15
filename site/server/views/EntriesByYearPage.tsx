@@ -1,5 +1,4 @@
 import React from "react"
-import moment from "moment"
 import * as lodash from "lodash"
 
 import { Post } from "db/model/Post"
@@ -8,12 +7,13 @@ import { BAKED_BASE_URL } from "settings"
 import { SiteHeader } from "./SiteHeader"
 import { SiteFooter } from "./SiteFooter"
 import { TableOfContents } from "site/client/TableOfContents"
+import { DateTime } from "luxon"
 
 type Entry = Pick<Post.Row, "title" | "slug" | "published_at">
 
 export const EntriesByYearPage = (props: { entries: Entry[] }) => {
     const entriesByYear = lodash.groupBy(props.entries, (e) =>
-        moment(e.published_at as Date).year()
+        DateTime.fromJSDate(e.published_at as Date).get("year")
     )
 
     const years = Object.keys(entriesByYear).sort().reverse()
@@ -102,7 +102,7 @@ export const EntriesForYearPage = (props: {
     year: number
 }) => {
     const entriesByYear = lodash.groupBy(props.entries, (e) =>
-        moment(e.published_at as Date).year()
+        DateTime.fromJSDate(e.published_at as Date).get("year")
     )
 
     const years = Object.keys(entriesByYear)

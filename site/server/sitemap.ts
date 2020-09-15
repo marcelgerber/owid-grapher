@@ -1,11 +1,11 @@
 import { Post } from "db/model/Post"
 import { Chart } from "db/model/Chart"
 import { BAKED_BASE_URL, BAKED_GRAPHER_URL } from "settings"
-import moment from "moment"
 import * as db from "db/db"
 import { countries } from "utils/countries"
 import urljoin from "url-join"
 import { countryProfileSpecs } from "site/server/countryProfileProjects"
+import { DateTime } from "luxon"
 
 interface SitemapUrl {
     loc: string
@@ -53,13 +53,17 @@ export async function makeSitemap() {
         .concat(
             posts.map((p) => ({
                 loc: urljoin(BAKED_BASE_URL, p.slug),
-                lastmod: moment(p.updated_at).format("YYYY-MM-DD"),
+                lastmod: DateTime.fromJSDate(p.updated_at).toFormat(
+                    "yyyy-mm-dd"
+                ),
             }))
         )
         .concat(
             charts.map((c) => ({
                 loc: urljoin(BAKED_GRAPHER_URL, c.slug),
-                lastmod: moment(c.updatedAt).format("YYYY-MM-DD"),
+                lastmod: DateTime.fromJSDate(c.updatedAt).toFormat(
+                    "yyyy-mm-dd"
+                ),
             }))
         ) as SitemapUrl[]
 

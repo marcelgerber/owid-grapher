@@ -1,5 +1,5 @@
+import { DateTime } from "luxon"
 import * as React from "react"
-import moment from "moment"
 
 export const CitationMeta = (props: {
     // id: number
@@ -25,7 +25,7 @@ export const CitationMeta = (props: {
         <meta name="citation_online_date" content={moment(date).format("YYYY/MM/DD")}/> */}
             <meta
                 name="citation_publication_date"
-                content={moment(date).format("YYYY/MM/DD")}
+                content={DateTime.fromJSDate(date).toFormat("YYYY/MM/DD")}
             />
             <meta name="citation_journal_title" content="Our World in Data" />
             <meta name="citation_journal_abbrev" content="Our World in Data" />

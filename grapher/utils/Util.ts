@@ -107,7 +107,7 @@ export {
     xor,
 }
 
-import moment from "moment"
+import { DateTime, Duration } from "luxon"
 import { formatLocale } from "d3-format"
 import { extent } from "d3-array"
 import striptags from "striptags"
@@ -210,11 +210,13 @@ export function formatDay(
     dayAsYear: number,
     options?: { format?: string }
 ): string {
-    const format = defaultTo(options?.format, "MMM D, YYYY")
+    const format = defaultTo(options?.format, "MMM d, yyyy")
     // Use moments' UTC mode https://momentjs.com/docs/#/parsing/utc/
     // This will force moment to format in UTC time instead of local time,
     // making dates consistent no matter what timezone the user is in.
-    return moment.utc(EPOCH_DATE).add(dayAsYear, "days").format(format)
+    return DateTime.fromISO(EPOCH_DATE, { zone: "utc" })
+        .plus(Duration.fromObject({ days: dayAsYear }))
+        .toFormat(format)
 }
 
 export function formatYear(year: number): string {
@@ -700,7 +702,8 @@ export function dateDiffInDays(a: Date, b: Date) {
 }
 
 export function diffDateISOStringInDays(a: string, b: string): number {
-    return moment.utc(a).diff(moment.utc(b), "days")
+    const duration = DateTime.fromISO(a).diff(DateTime.fromISO(b), "days")
+    return duration.days
 }
 
 export function addDays(date: Date, days: number): Date {

@@ -319,13 +319,13 @@ class DateColumn extends TemporalColumn {
     }
 
     formatValueForMobile(value: number) {
-        return formatDay(value, { format: "MMM D, 'YY" })
+        return formatDay(value, { format: "MMM d, 'yy" })
     }
 
     formatForCsv(value: number) {
         return value === undefined
             ? ""
-            : formatDay(value, { format: "YYYY-MM-DD" })
+            : formatDay(value, { format: "yyyy-mm-dd" })
     }
 }
 

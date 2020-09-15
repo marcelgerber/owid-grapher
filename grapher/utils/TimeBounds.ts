@@ -135,7 +135,7 @@ export function formatTimeURIComponent(
     isDate: boolean
 ): string {
     if (isUnbounded(time)) return formatTimeBound(time)
-    return isDate ? formatDay(time, { format: "YYYY-MM-DD" }) : `${time}`
+    return isDate ? formatDay(time, { format: "yyyy-mm-dd" }) : `${time}`
 }
 
 export function parseTimeURIComponent(

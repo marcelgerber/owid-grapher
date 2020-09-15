@@ -12,7 +12,7 @@ import {
     fetchText,
     fetchJSON,
 } from "grapher/utils/Util"
-import moment from "moment"
+import { DateTime } from "luxon"
 import { csv } from "d3-fetch"
 import { csvParse } from "d3-dsv"
 import {
@@ -236,7 +236,7 @@ export class CovidExplorerTable {
                 ? rows.filter((row) => row.date === annoRow.date)
                 : rows
             const datePrefix = annoRow.date
-                ? moment(annoRow.date).format("MMM D") + ": "
+                ? DateTime.fromISO(annoRow.date).toFormat("MMM D") + ": "
                 : ""
             applyTo.forEach((row) => {
                 if (annoRow[caseSlug])
@@ -735,8 +735,8 @@ const dateToYear = (dateString: string): number => {
         dateToYearCache.set(
             dateString,
             dateDiffInDays(
-                moment.utc(dateString).toDate(),
-                moment.utc("2020-01-21").toDate()
+                DateTime.fromISO(dateString, { zone: "utc" }).toJSDate(),
+                DateTime.utc(2020, 1, 21).toJSDate()
             )
         )
     return dateToYearCache.get(dateString)!

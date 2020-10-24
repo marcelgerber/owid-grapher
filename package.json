@@ -152,7 +152,7 @@
         "lodash": "^4.17.20",
         "mathjax-full": "^3.1.0",
         "md5": "^2.2.1",
-        "mini-css-extract-plugin": "^1.1.2",
+        "mini-css-extract-plugin": "^1.2.0",
         "minimist": "^1.2.3",
         "mobx": "^5.13.0",
         "mobx-formatters": "^1.0.2",

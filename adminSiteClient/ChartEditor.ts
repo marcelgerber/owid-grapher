@@ -188,6 +188,7 @@ export class ChartEditor {
         if (json.success) {
             if (isNewGrapher) {
                 this.newChartId = json.chartId
+                this.grapher.id = json.chartId
             } else {
                 runInAction(() => {
                     grapher.version += 1

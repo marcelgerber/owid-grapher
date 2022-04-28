@@ -22,6 +22,10 @@ jobs:
               shell: bash
               run: echo "PUSH_BRANCH_NAME=${{ GITHUB_REPOSITORY_OWNER }}/${{ GITHUB_REF_NAME }}" >> $GITHUB_ENV
 
+            - name: Print branch name
+              shell: bash
+              run: echo "${{env.PUSH_BRANCH_NAME}}"
+
             # Checkout the owid-grapher-svgs repo into a subfolder. Use a Personal Access Token for checkout so the
             # action will have permission to push later on if required.
             - name: Clone svg tester repo
